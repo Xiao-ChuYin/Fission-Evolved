@@ -123,7 +123,7 @@
 ### Requirements
 
 - Minecraft 1.7.10 and a GTNH / GT5U runtime.
-- GTNH 2.9.0-beta-2 is the compatibility baseline; later test and daily builds are the forward target.
+- GTNH 2.9.0 is the compatibility baseline; later test and daily builds are the forward target.
 - Java 25 is tested. The JAR retains Java 17/21/25 multi-release content.
 - NH Utilities, TST, and GTNL are optional. GTNH-only fallback recipes keep the full progression usable without them.
 
