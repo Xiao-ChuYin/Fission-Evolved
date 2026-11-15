@@ -242,10 +242,8 @@ public class MTEFissionReactor extends MTEExtendedPowerMultiBlockBase<MTEFission
         if (!wirelessEnabled) {
             // GT5U 5.09.52.604 (beta-1) exposes checkHasAnyEnergy(errors); newer dailies expose
             // checkHasAnyDynamo(errors). Resolve by reflection so a single jar works on both.
-            StructureCompat.checkHasAnyDynamo(
-                this,
-                errors,
-                !mDynamoHatches.isEmpty() || !getExoticDynamoHatches().isEmpty());
+            boolean hasDynamo = !mDynamoHatches.isEmpty() || !getExoticDynamoHatches().isEmpty();
+            StructureCompat.checkHasAnyDynamo(this, errors, hasDynamo);
         }
 
         if (errors.isEmpty()) {

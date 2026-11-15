@@ -54,9 +54,9 @@ final class TextureCompat {
         Method factory = findFactory();
         if (factory != null) {
             try {
-                return (ITexture[]) factory
-                    .invoke(null, provider, side, facing, active, frontInactive, frontInactiveGlow, frontActive,
-                        frontActiveGlow);
+                Object[] args = { provider, side, facing, active, frontInactive, frontInactiveGlow, frontActive,
+                    frontActiveGlow };
+                return (ITexture[]) factory.invoke(null, args);
             } catch (ReflectiveOperationException | LinkageError | RuntimeException e) {
                 // fall through to the portable builder
             }

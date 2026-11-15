@@ -41,8 +41,10 @@ final class StructureCompat {
             java.lang.reflect.Method exotic = controller.getClass()
                 .getMethod("getExoticDynamoHatches");
             Object exoticList = exotic.invoke(controller);
-            return exoticList instanceof java.util.Collection
-                && !((java.util.Collection<?>) exoticList).isEmpty();
+            if (exoticList instanceof java.util.Collection) {
+                return !((java.util.Collection<?>) exoticList).isEmpty();
+            }
+            return false;
         } catch (ReflectiveOperationException | LinkageError | RuntimeException e) {
             // Unknown state: do not add a spurious structure error.
             return true;
@@ -97,9 +99,9 @@ final class StructureCompat {
                 .get(null);
             Object dynamo = hatchElements.getField("Dynamo")
                 .get(null);
-            Object error = structureErrors
-                .getMethod("hatchCount", errorTypes, hatchElements, int.class, int.class)
-                .invoke(null, tooFew, dynamo, 0, 1);
+            Class<?>[] signature = { errorTypes, hatchElements, int.class, int.class };
+            Method hatchCount = structureErrors.getMethod("hatchCount", signature);
+            Object error = hatchCount.invoke(null, tooFew, dynamo, 0, 1);
             @SuppressWarnings("unchecked")
             List<StructureError> list = errors;
             list.add((StructureError) error);
