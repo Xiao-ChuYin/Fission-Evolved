@@ -240,7 +240,12 @@ public class MTEFissionReactor extends MTEExtendedPowerMultiBlockBase<MTEFission
         checkHasInputBus(errors);
         checkHasOutputBus(errors);
         if (!wirelessEnabled) {
-            checkHasAnyDynamo(errors);
+            // GT5U 5.09.52.604 (beta-1) exposes checkHasAnyEnergy(errors); newer dailies expose
+            // checkHasAnyDynamo(errors). Resolve by reflection so a single jar works on both.
+            StructureCompat.checkHasAnyDynamo(
+                this,
+                errors,
+                !mDynamoHatches.isEmpty() || !getExoticDynamoHatches().isEmpty());
         }
 
         if (errors.isEmpty()) {
@@ -777,11 +782,12 @@ public class MTEFissionReactor extends MTEExtendedPowerMultiBlockBase<MTEFission
             && frontInactiveGlow != null
             && frontActive != null
             && frontActiveGlow != null) {
-            return Textures.BlockIcons.createTextureWithCasing(
+            return TextureCompat.createFront(
                 this,
                 side,
                 facing,
                 active,
+                getCasingTexture(),
                 frontInactive,
                 frontInactiveGlow,
                 frontActive,
@@ -806,7 +812,8 @@ public class MTEFissionReactor extends MTEExtendedPowerMultiBlockBase<MTEFission
 
     @Override
     protected MultiblockTooltipBuilder createTooltip() {
-        return new MultiblockTooltipBuilder().addMachineType(tr("fissionevolved.reactor.type"))
+        MultiblockTooltipBuilder builder = new MultiblockTooltipBuilder()
+            .addMachineType(tr("fissionevolved.reactor.type"))
             .addInfo(tr("fissionevolved.reactor.info.fuels"))
             .addInfo(tr("fissionevolved.reactor.info.power_formula"))
             .addInfo(tr("fissionevolved.reactor.info.duration"))
@@ -831,26 +838,33 @@ public class MTEFissionReactor extends MTEExtendedPowerMultiBlockBase<MTEFission
             .addInfo(tr("fissionevolved.reactor.info.wireless"))
             .addInfo(tr("fissionevolved.reactor.info.buffer"))
             .beginStructureBlock(7, 7, 7, false)
-            .addController(tr("fissionevolved.reactor.structure.controller"))
-            .addCasing("112", tr("fissionevolved.reactor.structure.casing"), true)
-            .addCasing("149", tr("fissionevolved.reactor.structure.glass"), true)
-            .addCasing("27", tr("fissionevolved.reactor.structure.coil"), true)
-            .addInputBus("1+", tr("fissionevolved.reactor.structure.surface"), 1)
-            .addOutputBus("1+", tr("fissionevolved.reactor.structure.surface"), 1)
-            .addInputHatch("0+", tr("fissionevolved.reactor.structure.surface"), 1)
-            .addOutputHatch("0+", tr("fissionevolved.reactor.structure.surface"), 1)
-            .addDynamoHatch("1+", tr("fissionevolved.reactor.structure.surface"), 1)
-            .addMaintenanceHatch("0+", tr("fissionevolved.reactor.structure.surface"), 1)
-            .addStructureInfo(tr("fissionevolved.reactor.structure.unlimited_hatches"))
+            .addController(tr("fissionevolved.reactor.structure.controller"));
+
+        // The tooltip builder API was replaced between GT5U 5.09.52.604 (beta-1) and 5.09.54.98 (beta-2).
+        // Route every version-sensitive call through TooltipCompat so one jar works on both generations.
+        String surface = tr("fissionevolved.reactor.structure.surface");
+        int[] dot = { 1 };
+        TooltipCompat.addCasing(builder, "112", tr("fissionevolved.reactor.structure.casing"), true);
+        TooltipCompat.addCasing(builder, "149", tr("fissionevolved.reactor.structure.glass"), true);
+        TooltipCompat.addCasing(builder, "27", tr("fissionevolved.reactor.structure.coil"), true);
+        TooltipCompat.addInputBus(builder, "1+", surface, dot);
+        TooltipCompat.addOutputBus(builder, "1+", surface, dot);
+        TooltipCompat.addInputHatch(builder, "0+", surface, dot);
+        TooltipCompat.addOutputHatch(builder, "0+", surface, dot);
+        TooltipCompat.addDynamoHatch(builder, "1+", surface, dot);
+        TooltipCompat.addMaintenanceHatch(builder, "0+", surface, dot);
+        builder.addStructureInfo(tr("fissionevolved.reactor.structure.unlimited_hatches"))
             .addStructureInfo(tr("fissionevolved.reactor.structure.same_tiers"))
-            .addStructureInfo("")
-            .addSubChannel(GTStructureChannels.METAL_MACHINE_CASING)
-            .addSubChannel(GTStructureChannels.HEATING_COIL)
-            .addSubChannel(GTStructureChannels.BOROGLASS)
-            .toolTipFinisher(
-                EnumChatFormatting.GRAY,
-                41,
-                EnumChatFormatting.GOLD + tr("fissionevolved.mod_name") + EnumChatFormatting.RESET);
+            .addStructureInfo("");
+        TooltipCompat.addSubChannel(builder, GTStructureChannels.METAL_MACHINE_CASING);
+        TooltipCompat.addSubChannel(builder, GTStructureChannels.HEATING_COIL);
+        TooltipCompat.addSubChannel(builder, GTStructureChannels.BOROGLASS);
+        TooltipCompat.finish(
+            builder,
+            EnumChatFormatting.GRAY,
+            41,
+            EnumChatFormatting.GOLD + tr("fissionevolved.mod_name") + EnumChatFormatting.RESET);
+        return builder;
     }
 
     protected static String tr(String key) {

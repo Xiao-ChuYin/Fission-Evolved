@@ -326,7 +326,8 @@ public final class MTEColossalFissionReactor extends MTEFissionReactor {
 
     @Override
     protected MultiblockTooltipBuilder createTooltip() {
-        return new MultiblockTooltipBuilder().addMachineType(tr("fissionevolved.colossal_reactor.type"))
+        MultiblockTooltipBuilder builder = new MultiblockTooltipBuilder()
+            .addMachineType(tr("fissionevolved.colossal_reactor.type"))
             .addInfo(tr("fissionevolved.colossal_reactor.info.dimensions"))
             .addInfo(tr("fissionevolved.colossal_reactor.info.exclusive_fuels"))
             .addInfo(tr("fissionevolved.colossal_reactor.info.base_outputs"))
@@ -340,43 +341,57 @@ public final class MTEColossalFissionReactor extends MTEFissionReactor {
             .addInfo(tr("fissionevolved.colossal_reactor.info.no_outputs"))
             .addInfo(tr("fissionevolved.colossal_reactor.info.forced_wireless"))
             .beginStructureBlock(STRUCTURE_DEPTH, STRUCTURE_WIDTH, STRUCTURE_HEIGHT, false)
-            .addController(tr("fissionevolved.reactor.structure.controller"))
-            .addCasing(
-                Integer.toString(countStructureSymbol('C')),
-                tr("fissionevolved.colossal_reactor.structure.containment"),
-                true)
-            .addCasing(Integer.toString(countStructureSymbol('G')), tr("fissionevolved.reactor.structure.glass"), true)
-            .addCasing(
-                Integer.toString(countStructureSymbol('R')),
-                tr("fissionevolved.colossal_reactor.structure.reflector"),
-                false)
-            .addCasing(
-                Integer.toString(countStructureSymbol('K')),
-                tr("fissionevolved.colossal_reactor.structure.conduit"),
-                false)
-            .addCasing(
-                Integer.toString(countStructureSymbol('P')),
-                tr("fissionevolved.colossal_reactor.structure.compression"),
-                false)
-            .addCasing(
-                Integer.toString(countStructureSymbol('S')),
-                tr("fissionevolved.colossal_reactor.structure.stabilisation"),
-                false)
-            .addCasing(
-                Integer.toString(countStructureSymbol('T')),
-                tr("fissionevolved.colossal_reactor.structure.dilation"),
-                false)
-            .addStructureInfo(tr("fissionevolved.colossal_reactor.structure.same_tiers"))
+            .addController(tr("fissionevolved.reactor.structure.controller"));
+
+        // TooltipCompat keeps a single jar loadable on GT5U 5.09.52.604 (beta-1) and 5.09.54.98 (beta-2).
+        TooltipCompat.addCasing(
+            builder,
+            Integer.toString(countStructureSymbol('C')),
+            tr("fissionevolved.colossal_reactor.structure.containment"),
+            true);
+        TooltipCompat.addCasing(
+            builder,
+            Integer.toString(countStructureSymbol('G')),
+            tr("fissionevolved.reactor.structure.glass"),
+            true);
+        TooltipCompat.addCasing(
+            builder,
+            Integer.toString(countStructureSymbol('R')),
+            tr("fissionevolved.colossal_reactor.structure.reflector"),
+            false);
+        TooltipCompat.addCasing(
+            builder,
+            Integer.toString(countStructureSymbol('K')),
+            tr("fissionevolved.colossal_reactor.structure.conduit"),
+            false);
+        TooltipCompat.addCasing(
+            builder,
+            Integer.toString(countStructureSymbol('P')),
+            tr("fissionevolved.colossal_reactor.structure.compression"),
+            false);
+        TooltipCompat.addCasing(
+            builder,
+            Integer.toString(countStructureSymbol('S')),
+            tr("fissionevolved.colossal_reactor.structure.stabilisation"),
+            false);
+        TooltipCompat.addCasing(
+            builder,
+            Integer.toString(countStructureSymbol('T')),
+            tr("fissionevolved.colossal_reactor.structure.dilation"),
+            false);
+        builder.addStructureInfo(tr("fissionevolved.colossal_reactor.structure.same_tiers"))
             .addStructureInfo(tr("fissionevolved.colossal_reactor.structure.free_interior"))
-            .addStructureInfo("")
-            .addSubChannel(GTStructureChannels.EOH_COMPRESSION)
-            .addSubChannel(GTStructureChannels.EOH_STABILISATION)
-            .addSubChannel(GTStructureChannels.EOH_DILATION)
-            .addSubChannel(GTStructureChannels.BOROGLASS)
-            .toolTipFinisher(
-                EnumChatFormatting.GRAY,
-                41,
-                EnumChatFormatting.GOLD + tr("fissionevolved.mod_name") + EnumChatFormatting.RESET);
+            .addStructureInfo("");
+        TooltipCompat.addSubChannel(builder, GTStructureChannels.EOH_COMPRESSION);
+        TooltipCompat.addSubChannel(builder, GTStructureChannels.EOH_STABILISATION);
+        TooltipCompat.addSubChannel(builder, GTStructureChannels.EOH_DILATION);
+        TooltipCompat.addSubChannel(builder, GTStructureChannels.BOROGLASS);
+        TooltipCompat.finish(
+            builder,
+            EnumChatFormatting.GRAY,
+            41,
+            EnumChatFormatting.GOLD + tr("fissionevolved.mod_name") + EnumChatFormatting.RESET);
+        return builder;
     }
 
     @Override

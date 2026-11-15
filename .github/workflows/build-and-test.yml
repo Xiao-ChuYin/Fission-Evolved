@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [ master, main ]
   push:
-    branches: [ master, main ]
+    branches: [ master, main, 'beta1-compat', 'beta1-compat/**' ]
 
 jobs:
   build-and-test:

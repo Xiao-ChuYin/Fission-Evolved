@@ -73,7 +73,7 @@
 | 项目 | 支持情况 |
 | --- | --- |
 | Minecraft | 1.7.10 |
-| GTNH | 以 2.9.0-beta-2 为基线，面向之后的测试版与 daily |
+| GTNH | 以 2.9.0-beta-2 为基线，面向之后的测试版与 daily；本分支通过兼容层额外支持 2.9.0 beta1（GT5U 5.09.52.604） |
 | Java | Java 25 已验证；JAR 保留 Java 17/21/25 多版本内容 |
 | 必需模组 | GregTech 5 Unofficial / GTNH 运行环境 |
 | 可选联动 | NH Utilities、Twist Space Technology、GT Not Leisure |
