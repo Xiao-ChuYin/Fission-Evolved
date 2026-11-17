@@ -74,7 +74,7 @@
 | 项目 | 支持情况 |
 | --- | --- |
 | Minecraft | 1.7.10 |
-| GTNH | 以 2.9.0-beta-2 为基线，面向之后的测试版与 daily |
+| GTNH | 编译基线 2.9.0-beta-1（GT5U 5.09.52.604）；同一 JAR 亦兼容之后的 beta-2 / stable / daily |
 | Java | Java 25 已验证；JAR 保留 Java 17/21/25 多版本内容 |
 | 必需模组 | GregTech 5 Unofficial / GTNH 运行环境 |
 | 可选联动 | NH Utilities、Twist Space Technology、GT Not Leisure |
@@ -123,7 +123,7 @@
 ### Requirements
 
 - Minecraft 1.7.10 and a GTNH / GT5U runtime.
-- GTNH 2.9.0 is the compatibility baseline; later test and daily builds are the forward target.
+- GTNH 2.9.0-beta-1 (GT5U 5.09.52.604) is the compile baseline; the same JAR also runs on beta-2, stable, and later daily builds.
 - Java 25 is tested. The JAR retains Java 17/21/25 multi-release content.
 - NH Utilities, TST, and GTNL are optional. GTNH-only fallback recipes keep the full progression usable without them.
 
