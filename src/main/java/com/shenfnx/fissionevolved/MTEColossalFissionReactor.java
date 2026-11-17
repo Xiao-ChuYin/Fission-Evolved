@@ -341,9 +341,15 @@ public final class MTEColossalFissionReactor extends MTEFissionReactor {
             .addInfo(tr("fissionevolved.colossal_reactor.info.forced_wireless"))
             .beginStructureBlock(STRUCTURE_DEPTH, STRUCTURE_WIDTH, STRUCTURE_HEIGHT, false)
             .addController(tr("fissionevolved.reactor.structure.controller"))
-            .addCasingInfoMin(tr("fissionevolved.colossal_reactor.structure.containment"), countStructureSymbol('C'), true)
+            .addCasingInfoMin(
+                tr("fissionevolved.colossal_reactor.structure.containment"),
+                countStructureSymbol('C'),
+                true)
             .addCasingInfoMin(tr("fissionevolved.reactor.structure.glass"), countStructureSymbol('G'), true)
-            .addCasingInfoMin(tr("fissionevolved.colossal_reactor.structure.reflector"), countStructureSymbol('R'), false)
+            .addCasingInfoMin(
+                tr("fissionevolved.colossal_reactor.structure.reflector"),
+                countStructureSymbol('R'),
+                false)
             .addCasingInfoMin(tr("fissionevolved.colossal_reactor.structure.conduit"), countStructureSymbol('K'), false)
             .addCasingInfoMin(
                 tr("fissionevolved.colossal_reactor.structure.compression"),
