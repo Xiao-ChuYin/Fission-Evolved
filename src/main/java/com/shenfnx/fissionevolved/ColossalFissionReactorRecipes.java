@@ -20,7 +20,11 @@ import gregtech.api.util.GTRecipeBuilder;
 /** Exact BigInteger fuel rules and NEI entries for the chunk-scale generator only. */
 public final class ColossalFissionReactorRecipes {
 
-    public static final int ONE_HOUR_TICKS = 20 * 60 * 60;
+    /**
+     * Colossal cycles use the same burn-rate stretch as the normal reactor: 100x longer, 1/100 the per-tick EU.
+     * Total EU per fuel item is therefore unchanged.
+     */
+    public static final int ONE_HOUR_TICKS = 20 * 60 * 60 * FissionReactorRecipes.BURN_TIME_SCALE;
     public static final int CATALYZED_DURATION_TICKS = 24 * ONE_HOUR_TICKS;
 
     public static final RecipeMap<RecipeMapBackend> RECIPES = RecipeMapBuilder

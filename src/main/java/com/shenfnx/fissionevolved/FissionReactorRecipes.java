@@ -43,6 +43,14 @@ public final class FissionReactorRecipes {
     private static final int CHANCE_SCALE = 10_000;
     private static final int MAX_INTRINSIC_PULSES = 11;
     private static final double REACTOR_CONVERSION = 900.0D;
+    /**
+     * Fuel rods burn {@code BURN_TIME_SCALE}x longer and, in exchange, generate exactly 1/{@code BURN_TIME_SCALE} of
+     * the per-tick EU. The two factors cancel, so the total EU delivered by one rod is unchanged; only the burn rate
+     * is stretched.
+     */
+    public static final int BURN_TIME_SCALE = 100;
+    /** Applied to per-tick output; must stay the exact reciprocal of {@link #BURN_TIME_SCALE}. */
+    private static final double PER_TICK_DIVISOR = BURN_TIME_SCALE;
     private static final String NUCLEAR_CONFIG_KEY = "balance/energy/generator/nuclear";
     private static final String NHU_MOD_ID = "NHUtilities";
     private static final String NHU_FUEL_ROD_CLASS = "com.xir.NHUtilities.common.items.itemFuelRod.FuelRod";
@@ -180,7 +188,9 @@ public final class FissionReactorRecipes {
             .multiply(BigDecimal.valueOf(nuclearMultiplier))
             .multiply(BigDecimal.valueOf(REACTOR_CONVERSION))
             .multiply(BigDecimal.valueOf(characteristicMultiplier))
-            .setScale(0, RoundingMode.HALF_UP)
+            // Rods now last BURN_TIME_SCALE times longer, so the per-tick figure is divided by the same factor.
+            // BigDecimal division happens after the exact multiply chain, keeping precision for huge values.
+            .divide(BigDecimal.valueOf(PER_TICK_DIVISOR), 0, RoundingMode.HALF_UP)
             .toBigInteger()
             .max(BigInteger.ZERO);
     }
@@ -195,7 +205,10 @@ public final class FissionReactorRecipes {
 
     private static int getDurationTicks(ItemRadioactiveCellIC rod) {
         // One durability point corresponds to one second in the IC2 reactor. This machine runs for 1/1000 of that.
-        return Math.max(20, (rod.getMaxDamageEx() + 49) / 50);
+        // BURN_TIME_SCALE stretches every rod's cycle 100x while the matching PER_TICK_DIVISOR cuts the per-tick
+        // output to 1/100, so total EU per rod is unchanged.
+        long stretched = (long) Math.max(20, (rod.getMaxDamageEx() + 49) / 50) * BURN_TIME_SCALE;
+        return (int) Math.min(Integer.MAX_VALUE, stretched);
     }
 
     private static double getFuelCharacteristicMultiplier(ItemRadioactiveCellIC rod) {
@@ -298,7 +311,9 @@ public final class FissionReactorRecipes {
             // full-heat multiplier model as GT MOX rods, so this machine evaluates it at the established 99% point.
             double characteristicMultiplier = 1.0D + 0.99D * Math.max(0.0D, data.heatBonus);
             BigInteger baseOutput = calculateBaseOutput(data.power, data.cells, characteristicMultiplier);
-            int durationTicks = Math.max(20, (data.duration + 49) / 50);
+            int durationTicks = (int) Math.min(
+                Integer.MAX_VALUE,
+                (long) Math.max(20, (data.duration + 49) / 50) * BURN_TIME_SCALE);
             FuelProfile profile = new FuelProfile(new ItemStack(data.fuel, 1, 0), baseOutput, durationTicks, recovery);
             PROFILES.put(data.fuel, profile);
             registerNEIRecipe(profile);

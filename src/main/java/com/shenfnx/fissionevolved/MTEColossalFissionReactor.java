@@ -228,8 +228,11 @@ public final class MTEColossalFissionReactor extends MTEFissionReactor {
     @Override
     protected BigInteger calculateRecipeOutput(FissionReactorRecipes.FuelProfile profile, int parallel) {
         BigInteger baseOutput = ColossalFissionReactorRecipes.getBaseOutput(profile.getFuel(1));
+        // Colossal cycles were stretched by BURN_TIME_SCALE in ColossalFissionReactorRecipes, so the per-tick
+        // figure is divided by the same factor. Total EU per cycle stays identical.
         return baseOutput.multiply(BigInteger.valueOf(parallel))
-            .multiply(BigInteger.valueOf(getStructurePowerMultiplier()));
+            .multiply(BigInteger.valueOf(getStructurePowerMultiplier()))
+            .divide(BigInteger.valueOf(FissionReactorRecipes.BURN_TIME_SCALE));
     }
 
     @Override
