@@ -41,6 +41,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import gregtech.api.GregTechAPI;
 import gregtech.api.enums.HeatingCoilLevel;
+import gregtech.api.enums.HatchElement;
 import gregtech.api.enums.Materials;
 import gregtech.api.enums.ParticleFX;
 import gregtech.api.enums.SoundResource;
@@ -63,7 +64,9 @@ import gregtech.api.recipe.RecipeMap;
 import gregtech.api.recipe.check.CheckRecipeResult;
 import gregtech.api.recipe.check.CheckRecipeResultRegistry;
 import gregtech.api.render.TextureFactory;
+import gregtech.api.structure.error.ErrorType;
 import gregtech.api.structure.error.StructureError;
+import gregtech.api.structure.error.StructureErrors;
 import gregtech.api.util.GTModHandler;
 import gregtech.api.util.GTUtility;
 import gregtech.api.util.MultiblockTooltipBuilder;
@@ -240,7 +243,7 @@ public class MTEFissionReactor extends MTEExtendedPowerMultiBlockBase<MTEFission
         checkHasInputBus(errors);
         checkHasOutputBus(errors);
         if (!wirelessEnabled) {
-            checkHasAnyDynamo(errors);
+            checkDynamoHatches(errors);
         }
 
         if (errors.isEmpty()) {
@@ -248,6 +251,28 @@ public class MTEFissionReactor extends MTEExtendedPowerMultiBlockBase<MTEFission
             baseTileEntity.sendBlockEvent(GregTechTileClientEvents.CHANGE_CUSTOM_DATA, getUpdateData());
             baseTileEntity.issueTextureUpdate();
         }
+    }
+
+    /**
+     * Requires at least one dynamo hatch when wireless output is disabled.
+     *
+     * <p>
+     * GT5U 5.09.52.604 (GTNH 2.9.0 beta1) does not expose {@code checkHasAnyDynamo(List)} on the multi-block base -
+     * only the energy-hatch variant {@code checkHasAnyEnergy(List)} exists, and that one is wrong for a generator.
+     * {@code mDynamoHatches} and {@code getExoticDynamoHatches()} are part of the beta1 base API though, so the
+     * check is reproduced against them directly instead of reaching for reflection. Both lists also exist in later
+     * GT5U builds, so this stays portable forward.
+     * </p>
+     */
+    protected void checkDynamoHatches(List<StructureError> errors) {
+        if (!mDynamoHatches.isEmpty()) {
+            return;
+        }
+        List<MTEHatch> exotic = getExoticDynamoHatches();
+        if (exotic != null && !exotic.isEmpty()) {
+            return;
+        }
+        errors.add(StructureErrors.hatchCount(ErrorType.TOO_FEW, HatchElement.Dynamo, 0, 1));
     }
 
     protected void updateHatchTextures() {
@@ -777,15 +802,17 @@ public class MTEFissionReactor extends MTEExtendedPowerMultiBlockBase<MTEFission
             && frontInactiveGlow != null
             && frontActive != null
             && frontActiveGlow != null) {
-            return Textures.BlockIcons.createTextureWithCasing(
-                this,
-                side,
-                facing,
-                active,
-                frontInactive,
-                frontInactiveGlow,
-                frontActive,
-                frontActiveGlow);
+            ITexture casingTexture = getCasingTexture();
+            if (side != facing) {
+                return new ITexture[] { casingTexture };
+            }
+            return new ITexture[] { casingTexture, TextureFactory.builder()
+                .addIcon(active ? frontActive : frontInactive)
+                .extFacing()
+                .build(), TextureFactory.builder()
+                    .addIcon(active ? frontActiveGlow : frontInactiveGlow)
+                    .extFacing()
+                    .build() };
         }
         ITexture casingTexture = getCasingTexture();
         if (side != facing) {
@@ -832,28 +859,25 @@ public class MTEFissionReactor extends MTEExtendedPowerMultiBlockBase<MTEFission
             .addInfo(tr("fissionevolved.reactor.info.buffer"))
             .beginStructureBlock(7, 7, 7, false)
             .addController(tr("fissionevolved.reactor.structure.controller"))
-            .addCasing("112", tr("fissionevolved.reactor.structure.casing"), true)
-            .addCasing("149", tr("fissionevolved.reactor.structure.glass"), true)
-            .addCasing("27", tr("fissionevolved.reactor.structure.coil"), true)
-            .addInputBus("1+", tr("fissionevolved.reactor.structure.surface"), 1)
-            .addOutputBus("1+", tr("fissionevolved.reactor.structure.surface"), 1)
-            .addInputHatch("0+", tr("fissionevolved.reactor.structure.surface"), 1)
-            .addOutputHatch("0+", tr("fissionevolved.reactor.structure.surface"), 1)
-            .addDynamoHatch("1+", tr("fissionevolved.reactor.structure.surface"), 1)
-            .addMaintenanceHatch("0+", tr("fissionevolved.reactor.structure.surface"), 1)
+            .addCasingInfoMin(tr("fissionevolved.reactor.structure.casing"), 112, true)
+            .addCasingInfoMin(tr("fissionevolved.reactor.structure.glass"), 149, true)
+            .addCasingInfoMin(tr("fissionevolved.reactor.structure.coil"), 27, true)
+            .addInputBus(tr("fissionevolved.reactor.structure.surface"), 1)
+            .addOutputBus(tr("fissionevolved.reactor.structure.surface"), 1)
+            .addInputHatch(tr("fissionevolved.reactor.structure.surface"), 1)
+            .addOutputHatch(tr("fissionevolved.reactor.structure.surface"), 1)
+            .addDynamoHatch(tr("fissionevolved.reactor.structure.surface"), 1)
+            .addMaintenanceHatch(tr("fissionevolved.reactor.structure.surface"), 1)
             .addStructureInfo(tr("fissionevolved.reactor.structure.unlimited_hatches"))
             .addStructureInfo(tr("fissionevolved.reactor.structure.same_tiers"))
             .addStructureInfo("")
-            .addSubChannel(GTStructureChannels.METAL_MACHINE_CASING)
-            .addSubChannel(GTStructureChannels.HEATING_COIL)
-            .addSubChannel(GTStructureChannels.BOROGLASS)
-            /*
-             * .toolTipFinisher(
-             * EnumChatFormatting.GRAY,
-             * 41,
-             * EnumChatFormatting.GOLD + tr("fissionevolved.mod_name") + EnumChatFormatting.RESET);
-             */
-            .toolTipFinisher(EnumChatFormatting.GOLD + tr("fissionevolved.mod_name") + EnumChatFormatting.RESET);
+            .addSubChannelUsage(GTStructureChannels.METAL_MACHINE_CASING)
+            .addSubChannelUsage(GTStructureChannels.HEATING_COIL)
+            .addSubChannelUsage(GTStructureChannels.BOROGLASS)
+            .toolTipFinisher(
+                EnumChatFormatting.GRAY,
+                41,
+                EnumChatFormatting.GOLD + tr("fissionevolved.mod_name") + EnumChatFormatting.RESET);
     }
 
     protected static String tr(String key) {

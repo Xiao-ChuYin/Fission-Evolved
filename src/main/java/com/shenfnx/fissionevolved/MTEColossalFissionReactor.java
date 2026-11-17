@@ -341,45 +341,33 @@ public final class MTEColossalFissionReactor extends MTEFissionReactor {
             .addInfo(tr("fissionevolved.colossal_reactor.info.forced_wireless"))
             .beginStructureBlock(STRUCTURE_DEPTH, STRUCTURE_WIDTH, STRUCTURE_HEIGHT, false)
             .addController(tr("fissionevolved.reactor.structure.controller"))
-            .addCasing(
-                Integer.toString(countStructureSymbol('C')),
-                tr("fissionevolved.colossal_reactor.structure.containment"),
-                true)
-            .addCasing(Integer.toString(countStructureSymbol('G')), tr("fissionevolved.reactor.structure.glass"), true)
-            .addCasing(
-                Integer.toString(countStructureSymbol('R')),
-                tr("fissionevolved.colossal_reactor.structure.reflector"),
-                false)
-            .addCasing(
-                Integer.toString(countStructureSymbol('K')),
-                tr("fissionevolved.colossal_reactor.structure.conduit"),
-                false)
-            .addCasing(
-                Integer.toString(countStructureSymbol('P')),
+            .addCasingInfoMin(tr("fissionevolved.colossal_reactor.structure.containment"), countStructureSymbol('C'), true)
+            .addCasingInfoMin(tr("fissionevolved.reactor.structure.glass"), countStructureSymbol('G'), true)
+            .addCasingInfoMin(tr("fissionevolved.colossal_reactor.structure.reflector"), countStructureSymbol('R'), false)
+            .addCasingInfoMin(tr("fissionevolved.colossal_reactor.structure.conduit"), countStructureSymbol('K'), false)
+            .addCasingInfoMin(
                 tr("fissionevolved.colossal_reactor.structure.compression"),
+                countStructureSymbol('P'),
                 false)
-            .addCasing(
-                Integer.toString(countStructureSymbol('S')),
+            .addCasingInfoMin(
                 tr("fissionevolved.colossal_reactor.structure.stabilisation"),
+                countStructureSymbol('S'),
                 false)
-            .addCasing(
-                Integer.toString(countStructureSymbol('T')),
+            .addCasingInfoMin(
                 tr("fissionevolved.colossal_reactor.structure.dilation"),
+                countStructureSymbol('T'),
                 false)
             .addStructureInfo(tr("fissionevolved.colossal_reactor.structure.same_tiers"))
             .addStructureInfo(tr("fissionevolved.colossal_reactor.structure.free_interior"))
             .addStructureInfo("")
-            .addSubChannel(GTStructureChannels.EOH_COMPRESSION)
-            .addSubChannel(GTStructureChannels.EOH_STABILISATION)
-            .addSubChannel(GTStructureChannels.EOH_DILATION)
-            .addSubChannel(GTStructureChannels.BOROGLASS)
-            /*
-             * .toolTipFinisher(
-             * EnumChatFormatting.GRAY,
-             * 41,
-             * EnumChatFormatting.GOLD + tr("fissionevolved.mod_name") + EnumChatFormatting.RESET)
-             */
-            .toolTipFinisher(EnumChatFormatting.GOLD + tr("fissionevolved.mod_name") + EnumChatFormatting.RESET);
+            .addSubChannelUsage(GTStructureChannels.EOH_COMPRESSION)
+            .addSubChannelUsage(GTStructureChannels.EOH_STABILISATION)
+            .addSubChannelUsage(GTStructureChannels.EOH_DILATION)
+            .addSubChannelUsage(GTStructureChannels.BOROGLASS)
+            .toolTipFinisher(
+                EnumChatFormatting.GRAY,
+                41,
+                EnumChatFormatting.GOLD + tr("fissionevolved.mod_name") + EnumChatFormatting.RESET);
     }
 
     @Override

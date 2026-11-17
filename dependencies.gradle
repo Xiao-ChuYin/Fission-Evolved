@@ -34,9 +34,11 @@
  * For more details, see https://docs.gradle.org/8.0.1/userguide/java_library_plugin.html#sec:java_library_configurations_graph
  */
 dependencies {
-    // Latest GTNH GregTech artifact available when this workspace was bootstrapped.
-    // Its Gradle metadata supplies the matching GTNH runtime/API dependency set.
-    api("com.github.GTNewHorizons:GT5-Unofficial:5.09.54.265:dev")
+    // Pinned to the exact GT5U build shipped by GTNH 2.9.0 beta1.
+    // Compiling against the real beta1 jar makes javac reject any GT5U API call that beta1 cannot link,
+    // instead of discovering it at runtime as a NoSuchMethodError. Its Gradle metadata supplies the
+    // matching GTNH runtime/API dependency set.
+    api("com.github.GTNewHorizons:GT5-Unofficial:5.09.52.604:dev")
 
     // Loads the external translation pack in the development client only.
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:TX-Loader:1.8.11:dev")
