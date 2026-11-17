@@ -311,9 +311,8 @@ public final class FissionReactorRecipes {
             // full-heat multiplier model as GT MOX rods, so this machine evaluates it at the established 99% point.
             double characteristicMultiplier = 1.0D + 0.99D * Math.max(0.0D, data.heatBonus);
             BigInteger baseOutput = calculateBaseOutput(data.power, data.cells, characteristicMultiplier);
-            int durationTicks = (int) Math.min(
-                Integer.MAX_VALUE,
-                (long) Math.max(20, (data.duration + 49) / 50) * BURN_TIME_SCALE);
+            int durationTicks = (int) Math
+                .min(Integer.MAX_VALUE, (long) Math.max(20, (data.duration + 49) / 50) * BURN_TIME_SCALE);
             FuelProfile profile = new FuelProfile(new ItemStack(data.fuel, 1, 0), baseOutput, durationTicks, recovery);
             PROFILES.put(data.fuel, profile);
             registerNEIRecipe(profile);
