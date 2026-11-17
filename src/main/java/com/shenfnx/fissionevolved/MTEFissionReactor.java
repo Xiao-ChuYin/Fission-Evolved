@@ -40,8 +40,8 @@ import com.gtnewhorizon.structurelib.structure.StructureDefinition;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import gregtech.api.GregTechAPI;
-import gregtech.api.enums.HeatingCoilLevel;
 import gregtech.api.enums.HatchElement;
+import gregtech.api.enums.HeatingCoilLevel;
 import gregtech.api.enums.Materials;
 import gregtech.api.enums.ParticleFX;
 import gregtech.api.enums.SoundResource;
@@ -809,7 +809,8 @@ public class MTEFissionReactor extends MTEExtendedPowerMultiBlockBase<MTEFission
             return new ITexture[] { casingTexture, TextureFactory.builder()
                 .addIcon(active ? frontActive : frontInactive)
                 .extFacing()
-                .build(), TextureFactory.builder()
+                .build(),
+                TextureFactory.builder()
                     .addIcon(active ? frontActiveGlow : frontInactiveGlow)
                     .extFacing()
                     .build() };
